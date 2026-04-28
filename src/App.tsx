@@ -1,5 +1,5 @@
 import { StrictMode, useEffect } from "react";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -51,7 +51,8 @@ const App = () => {
           <Sonner />
 
           {/* Routes */}
-          <HashRouter>
+          <BrowserRouter>
+          {/* <HashRouter> */}
             <Routes>
               {/* Auth routes */}
               <Route path="auth/login" element={<Login />} />
@@ -77,7 +78,8 @@ const App = () => {
               {/* Fallback route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </HashRouter>
+          </BrowserRouter>
+          {/* </HashRouter> */}
         </TooltipProvider>
       </QueryClientProvider>
     </StrictMode>
