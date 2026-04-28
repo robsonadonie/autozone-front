@@ -1,0 +1,12 @@
+@font-face {
+    font-family: "hongkong";
+    src: url("/fonts/op.ttf");
+}
+
+.FSP {
+    font-family: hongkong   !important;
+    /* font-style: italic; */
+    font-size: 50px !important;
+    color: red;
+    /* color: green !important; */
+}

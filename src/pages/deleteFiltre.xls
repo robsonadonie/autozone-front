@@ -1,0 +1,181 @@
+   <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen} >
+          <SheetTrigger asChild>
+            <Button variant="outline">
+              <Filter className="h-4 w-4 mr-2" />
+              Filtres avancés
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle>Filtres avancés</SheetTitle>
+              <SheetDescription>
+                Les filtres sont appliqués automatiquement
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="space-y-6 mt-6">
+              {/* Période */}
+              
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Période</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Date début</Label>
+                    <div className="relative">
+                      <input type="date" className="bg-none border py-1 px-4 text-sm" />
+                      
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Date fin</Label>
+                    <div className="relative">
+
+                      <input type="date" className="bg-none border py-1 px-4 text-sm" />
+
+ 
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Origine */}
+              <div className="space-y-2">
+                <Label>Origine</Label>
+                <Select value={filters.origine} onValueChange={(value) => setFilters({ ...filters, origine: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Toutes les origines" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les origines</SelectItem>
+                    {origines.map((origine) => (
+                      <SelectItem key={origine} value={origine}>{origine}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Marque produit */}
+              <div className="space-y-2">
+                <Label>Marque produit</Label>
+                <Select value={filters.marqueProduit} onValueChange={(value) => setFilters({ ...filters, marqueProduit: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Toutes les marques produit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les marques produit</SelectItem>
+                    {marquesProduit.map((marque) => (
+                      <SelectItem key={marque} value={marque}>{marque}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Marque */}
+              <div className="space-y-2">
+                <Label>Marque</Label>
+                <Select value={filters.marque} onValueChange={(value) => setFilters({ ...filters, marque: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Toutes les marques" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les marques</SelectItem>
+                    {marques.map((marque) => (
+                      <SelectItem key={marque} value={marque}>{marque}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Modèle */}
+              <div className="space-y-2">
+                <Label>Modèle</Label>
+                <Select value={filters.modele} onValueChange={(value) => setFilters({ ...filters, modele: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Tous les modèles" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les modèles</SelectItem>
+                    {modeles.map((modele) => (
+                      <SelectItem key={modele} value={modele}>{modele}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Série */}
+              <div className="space-y-2">
+                <Label>Série</Label>
+                <Select value={filters?.serie} onValueChange={(value) => setFilters({ ...filters, serie: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Toutes les séries" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Toutes les séries</SelectItem>
+                    {series.map((serie) => (
+                      <SelectItem key={serie} value={serie}>{serie}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Personnel & Clients */}
+              <div className="space-y-4">
+                <Label className="text-sm font-medium">Personnel & Clients</Label>
+
+                <div className="space-y-2">
+                  <Label>Vendeur</Label>
+                  <Select value={filters.vendeur} onValueChange={(value) => setFilters({ ...filters, vendeur: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Tous les vendeurs" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tous les vendeurs</SelectItem>
+                      {vendeurs.map((vendeur) => (
+                        <SelectItem key={vendeur} value={vendeur}>{vendeur}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Client</Label>
+                  <Input
+                    placeholder="Nom du client"
+                    value={filters.client}
+                    onChange={(e) => setFilters({ ...filters, client: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              {/* Catégories sélectionnées */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Catégories sélectionnées</Label>
+                <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                  {categories.map((category) => (
+                    <div key={category} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`category-${category}`}
+                        checked={filters.categories.includes(category)}
+                        onCheckedChange={(checked) => handleCategoryChange(category, checked as boolean)}
+                      />
+                      <Label
+                        htmlFor={`category-${category}`}
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        {category}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bouton d'effacement */}
+              <div className="pt-4">
+                <Button onClick={clearFilters} variant="outline" className="w-full">
+                  <X className="h-4 w-4 mr-2" />
+                  Effacer tous les filtres
+                </Button>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>

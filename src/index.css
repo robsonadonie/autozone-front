@@ -1,0 +1,145 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+  margin: 0;
+  padding:0;
+  /* transform: scale(0.99); */
+  /* display: none; */
+  box-sizing: border-box;
+  
+}
+
+
+@layer base {
+  :root {
+    background: 220 33% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 217 72% 40%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 215 16% 47%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 215 25% 95%;
+    --muted-foreground: 215 16% 45%;
+
+    --accent: 215 25% 92%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 32% 90%;
+    --input: 214 32% 90%;
+    --ring: 217 72% 40%;
+
+    --radius: 0.3rem;
+
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 215 25% 95%;
+    --sidebar-primary: 217 72% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 28% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 215 28% 17%;
+    --sidebar-ring: 217 91% 60%;
+  }
+}
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "ss02";
+    color: var();
+  }
+}
+
+@layer components {
+  .stats-card {
+    @apply rounded-lg bg-card p-6 shadow-sm transition-all hover:shadow-md;
+  }
+  
+  .data-card {
+    @apply rounded-lg bg-white shadow-sm transition-all hover:shadow-md;
+  }
+  
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-[1.02];
+  }
+  
+  .sidebar-link {
+    @apply flex items-center gap-3 rounded-md px-3 py-2 text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground;
+  }
+  
+  .sidebar-link.active {
+    @apply bg-sidebar-accent text-sidebar-accent-foreground;
+  }
+
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-sm;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-subtle-pulse {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes slide-in-right {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.5s ease-out forwards;
+}
+ 
