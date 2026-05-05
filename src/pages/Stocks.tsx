@@ -1300,7 +1300,10 @@ const Stocks = () => {
                                 <TableHead style={{ textWrap: "nowrap" }} className=" text-nowrap cursor-pointer hover:bg-gray-100" onClick={() => { handleSort("quantite"), sortOrder === "asc" ? (setPrice(0), setTri(1), setName(0)) : (setPrice(0), setTri(2), setName(0)) }}>Stock {sortField === "quantite" && (sortOrder === "asc" ? "↑" : "↓")}</TableHead>
                                 <TableHead style={{ textWrap: "nowrap" }}>Statut</TableHead>
                                 <TableHead style={{ textWrap: "nowrap" }} className=" text-nowrap cursor-pointer hover:bg-gray-100" onClick={() => handleSort('emplacement' as any)}>Emplacement {sortField === 'emplacement' && (sortOrder === 'asc' ? '↑' : '↓')}</TableHead>
+                                {
+    decoded.role == "admin" &&
                                 <TableHead style={{ textWrap: "nowrap" }} className="text-end">Prix Achat</TableHead>
+                                }
                                 <TableHead style={{ textWrap: "nowrap" }} className="text-end">Prix Afficher</TableHead>
                                 <TableHead style={{ textWrap: "nowrap" }} className="text-end">Dérnier prix</TableHead>
                                 {/* <TableHead>Marge</TableHead> */}
@@ -1371,7 +1374,10 @@ const Stocks = () => {
 
                                       </TableCell>
                                       <TableCell className="font-mono text-center text-sm " style={{ fontSize: "12px" }}>{item.emplacement}</TableCell>
+                                      {
+    decoded.role == "admin" &&
                                       <TableCell className="text-nowrap text-end font-semibold" style={{ fontSize: "11px" }} > {formatNumber(item.prix_achat) || 0} Ar</TableCell>
+                                      }
                                       <TableCell className="text-nowrap text-end font-semibold" style={{ fontSize: "11px" }}>{formatNumber(item.prix_affiche) || 0} Ar</TableCell>
                                       <TableCell className="text-nowrap text-end font-semibold"  style={{ fontSize: "11px" }}>{formatNumber(item.dernier_prix) || 0} Ar</TableCell>
 
@@ -1716,20 +1722,27 @@ const Stocks = () => {
                   </div> */}
                 </div>
                 <div className="grid grid-cols-3 gap-10 p-4 bg-gray-50 rounded-lg">
+                  {
+    decoded.role == "admin" &&
                   <div className="text-center">
                     <p className="text-sm  text-nowrap text-gray-600">Prix d'achat</p>
                     <p className="text-lg font-bold text-nowrap text-red-600">{formatNumber(selectedItem.prix_achat)} Ar</p>
                   </div>
+}
                   <div className="text-center">
                     <p className="text-sm text-nowrap text-gray-600">Prix de vente</p>
                     <p className="text-lg text-nowrap font-bold text-green-600">{formatNumber(selectedItem.prix_affiche)} Ar</p>
                   </div>
+                  {
+    decoded.role == "admin" &&
+
                   <div className="text-center">
                     <p className="text-sm text-gray-600">Marge</p>
                     <p className="text-lg font-bold text-blue-600">
                       {((selectedItem.prix_affiche - selectedItem.prix_achat) / selectedItem.prix_achat * 100).toFixed(1)}%
                     </p>
                   </div>
+                  }
                 </div>
               </div>
             </div>
@@ -1828,7 +1841,7 @@ const Stocks = () => {
 
 
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
           <form action="" onSubmit={CreateVente}>
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold">Nouvelle vente de : <span className="italic" style={{ fontWeight: "500", fontSize: "15px" }}>{stockSelected?.designation}</span></DialogTitle>
@@ -2325,7 +2338,7 @@ const Stocks = () => {
 
 
       <Dialog open={isCreateInvoice} onOpenChange={setIsCreateInvoice}>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>Option pour la facturation</DialogTitle>
             <DialogDescription>

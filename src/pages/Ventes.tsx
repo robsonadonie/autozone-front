@@ -2220,7 +2220,7 @@ const Vente = () => {
         </DialogContent>
       </Dialog>
       <Dialog open={isDismissDialogOpen} onOpenChange={setIsDismissDialogOpen}>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>Confirmer l'annulation de vente</DialogTitle>
             <DialogDescription>
@@ -2241,7 +2241,7 @@ const Vente = () => {
         </DialogContent>
       </Dialog>
       <Dialog open={isCreateInvoice} onOpenChange={setIsCreateInvoice}>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>Option pour la facturation</DialogTitle>
             <DialogDescription>
@@ -2268,7 +2268,7 @@ const Vente = () => {
         </DialogContent>
       </Dialog>
       <Dialog open={isCreateInvoiceSelected} onOpenChange={setIsCreateInvoiceSelected}>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>Option pour la facturation</DialogTitle>
             <DialogDescription>

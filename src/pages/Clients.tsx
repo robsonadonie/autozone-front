@@ -899,7 +899,7 @@ const Clients = () => {
       </Dialog>
 
       <Dialog open={isCreateInvoice} onOpenChange={setIsCreateInvoice}>
-        <DialogContent>
+        <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>Option pour la facturation</DialogTitle>
             <DialogDescription>
