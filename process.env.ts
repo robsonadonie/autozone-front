@@ -1,1 +1,1 @@
-export const APP_URL = "https://back.autozone-mg.com"
+export const APP_URL = "https://data.autozone-mg.com"
