@@ -87,6 +87,7 @@ const Journal = () => {
   const reactToPrintFn = useReactToPrint({ contentRef })
 
   const Journals = useSelector((state: RootState) => state.journauxSlice.data)
+  const loadingJournals = useSelector((state: RootState) => state.journauxSlice.loading)
   const DelJournals = useSelector((state: RootState) => state.DeljournauxSlice)
   const Upjournaux = useSelector((state: RootState) => state.UpjournauxSlice)
   const AddJournals = useSelector((state: RootState) => state.AddjournauxSlice)
@@ -706,7 +707,7 @@ factureParDate();
                   
                   :
                   <TableCell colSpan={4} className="text-center py-2 text-gray-500 border">
-                    Aucune dépense enregistrée sur cette date
+                    {loadingJournals ? "Chargement en cours ..." : "Aucune dépense enregistrée sur cette date"}
                   </TableCell>
                   
                   }
@@ -714,7 +715,7 @@ factureParDate();
                   )))
                   :
                   <TableCell colSpan={4} className="text-center py-8 text-gray-500">
-                    Aucune dépense enregistrée pour cette date
+                    {loadingJournals ? "Chargement en cours ..." : "Aucune dépense enregistrée pour cette date"}
                   </TableCell>
               }
 
@@ -823,7 +824,7 @@ factureParDate();
                 )))
                 :
                 <TableCell colSpan={4} className="text-center py-8 text-gray-500">
-                  Aucune recette enregistrée pour cette date
+                  {loadingJournals ? "Chargement en cours ..." : "Aucune recette enregistrée pour cette date"}
                 </TableCell>
               }
               {/* {recette.length === 0 && (

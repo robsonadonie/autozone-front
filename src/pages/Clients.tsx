@@ -156,7 +156,7 @@ import Invoices from "./Invoices";
 // ];
 
 const Clients = () => {
-
+  const loadingClient = useSelector((state: RootState) => state.ClientSlice.loading)
   const AllInvoices = useSelector((state: RootState) => state.InvoicesSlice)
    
      const dispatch = useDispatch<AppDispatch>()
@@ -750,7 +750,7 @@ const Clients = () => {
                 </Table>
                 :
                 <div className="text-center mt-6 pt-2 border-t">
-                  <p className="text-sm">Aucun client trouvé</p>
+                  <p className="text-sm">{loadingClient ? "Chargement en cours ..." : "Aucun client trouvé"}</p>
                 </div>
             }
           </div>

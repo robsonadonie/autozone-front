@@ -216,6 +216,7 @@ const mockEntreesData: EntreeStock[] = [
 ];
 
 const Stocks = () => {
+  const loadingStock = useSelector((state: RootState) => state.StockSlice.loading)
   const AllInvoices = useSelector((state: RootState) => state.InvoicesSlice)
 
   const dispatch = useDispatch<AppDispatch>()
@@ -1409,7 +1410,7 @@ const Stocks = () => {
 
                                     <TableCell colSpan={12} className="h-24 text-center">
                                       <div className="flex flex-col items-center">
-                                        Aucun stock trouvé
+                                        {loadingStock ? "Chargement en cours ..." : "Aucun stock trouvé"}
                                         <Button variant="outline" onClick={() => { setSearchTerm(""), setComplexeFilter(DataStock) }} className="mt-4">
                                           <RefreshCcw className="h-4 w-4 mr-2" />
                                           Réinitialiser
@@ -1464,7 +1465,7 @@ const Stocks = () => {
               </div>
               :
               <div className="text-center mt-6 pt-2 border-t">
-                <p className="text-sm">Aucun stock trouvé</p>
+                <p className="text-sm">{loadingStock ? "Chargement en cours ..." : "Aucun stock trouvé"}</p>
               </div>
 
           }
@@ -1601,7 +1602,7 @@ const Stocks = () => {
               :
               <div >
                 <div style={{ padding: "2px 0", textAlign: "center", width: "100%" }}>
-                  Aucune entreé stock trouver
+                  {loadingStock ? "Chargement en cours ..." : "Aucune entreé stock trouver"}
                 </div>
               </div>
           }
@@ -1618,7 +1619,7 @@ const Stocks = () => {
             importExcelFile.fileReturned?.message[0] == "0" ?
               <p className="bg-red-100 py-2 flex items-center gap-8  px-8 ">
                 <XIcon size={16} />
-                Aucun stock importé
+                {loadingStock ? "Chargement en cours ..." : "Aucun stock importé"}
               </p>
               :
               <p className="bg-green-100 py-2 flex items-center gap-8  px-8 ">

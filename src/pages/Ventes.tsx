@@ -171,6 +171,7 @@ interface FilterState {
 }
 
 const Vente = () => {
+  const loadingVente = useSelector((state: RootState) => state.VentesSlice.loading)
   const AllInvoices = useSelector((state: RootState) => state.InvoicesSlice)
   const AddInvoices = useSelector((state: RootState) => state.AddInvoicesSlice)
   const dispatch = useDispatch<AppDispatch>()
@@ -1722,7 +1723,7 @@ const Vente = () => {
                         <TableRow>
                           <TableCell colSpan={12} className="h-24 text-center">
                             <div className="flex flex-col items-center">
-                              Aucune vente trouvée
+                              {loadingVente ? "Chargement en cours ..." : "Aucune vente trouvée"}
                               <Button variant="outline" onClick={resetFilters} className="mt-4">
                                 <RefreshCcw className="h-4 w-4 mr-2" />
                                 Réinitialiser
@@ -1739,7 +1740,7 @@ const Vente = () => {
           </div>
           :
           <div className="text-center mt-6 pt-2 border-t">
-            <p className="text-sm">Aucune vente trouvée</p>
+            <p className="text-sm">{loadingVente ? "Chargement en cours ..." : "Aucune vente trouvée"}</p>
           </div>
       }
 

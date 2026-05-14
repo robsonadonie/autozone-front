@@ -746,7 +746,7 @@ const Invoices = () => {
                 {filteredInvoices.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={8} className="text-center py-8 text-gray-500">
-                      Aucune facture trouvée
+                      {AllInvoices.loading ? "Chargement en cours ..." : "Aucune facture trouvée"}
                     </TableCell>
                   </TableRow>
                 )}
@@ -755,7 +755,7 @@ const Invoices = () => {
           </div>
           :
           <div className="text-center mt-6 pt-2 border-t">
-            <p className="text-sm">Aucun facture généré</p>
+            <p className="text-sm">{AllInvoices.loading ? "Chargement en cours ..." : "Aucun facture généré"}</p>
           </div>
       }
 
