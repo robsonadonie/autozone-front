@@ -16,6 +16,8 @@ export const VentesAsync =  createAsyncThunk(
 export const AddVentesAsync =  createAsyncThunk(
     "add-ventes",async(data)=>{
         try {
+            console.log(data);
+
             const result = await axios.post(`${APP_URL}/ventes`,data)
             return result.data
         } catch (error) {
@@ -26,6 +28,8 @@ export const AddVentesAsync =  createAsyncThunk(
 export const AddMoreVentesAsync =  createAsyncThunk(
     "add-more-ventes",async(data)=>{
         try {
+            console.log(data);
+            
             const result = await axios.post(`${APP_URL}/ventes/more`,data)
             return result.data
         } catch (error) {

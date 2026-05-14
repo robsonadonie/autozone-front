@@ -1146,24 +1146,24 @@ const Stocks = () => {
         <div className="flex gap-2">
           {
             decoded.role == "admin" &&
-            <Button variant="outline" className="" style={{fontSize:"12px"}} onClick={() => setIsExportFile(true)}>
+            <Button variant="outline" className="" style={{ fontSize: "12px" }} onClick={() => setIsExportFile(true)}>
               <UploadIcon className="h-4 w-4 mr-2" />
               Exporter Excel
             </Button>
           }
           {
             decoded.role == "admin" &&
-            <Button variant="outline" className="" style={{fontSize:"12px"}} onClick={() => setIsReferencesModalOpen(true)}>
+            <Button variant="outline" className="" style={{ fontSize: "12px" }} onClick={() => setIsReferencesModalOpen(true)}>
               <Package className="h-4 w-4 mr-2" />
               Références Pièces
             </Button>
           }
-          <Button variant="outline" className="" style={{fontSize:"12px"}} onClick={refresh}>
-            <RefreshCcw className="h-4 w-4 mr-2 text-xs"  size={7}/>
+          <Button variant="outline" className="" style={{ fontSize: "12px" }} onClick={refresh}>
+            <RefreshCcw className="h-4 w-4 mr-2 text-xs" size={7} />
           </Button>
           {
             decoded.role == "admin" &&
-            <Button onClick={() => setIsCreateStockModalOpen(true)} className="bg-blue-600 hover:bg-blue-700"  style={{fontSize:"12px"}} >
+            <Button onClick={() => setIsCreateStockModalOpen(true)} className="bg-blue-600 hover:bg-blue-700" style={{ fontSize: "12px" }} >
               <Plus className="h-4 w-4 mr-2" />
               Nouveau produit
             </Button>
@@ -1250,7 +1250,7 @@ const Stocks = () => {
                 <div className="my-2">
                   <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
                     <div className="relative w-full sm:w-auto">
-                      <Search  className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
+                      <Search className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
                       <Input
                         placeholder="Rechercher des pièces..."
                         className="pl-8 h-8 w-full sm:w-[300px]"
@@ -1302,8 +1302,8 @@ const Stocks = () => {
                                 <TableHead style={{ textWrap: "nowrap" }}>Statut</TableHead>
                                 <TableHead style={{ textWrap: "nowrap" }} className=" text-nowrap cursor-pointer hover:bg-gray-100" onClick={() => handleSort('emplacement' as any)}>Emplacement {sortField === 'emplacement' && (sortOrder === 'asc' ? '↑' : '↓')}</TableHead>
                                 {
-    decoded.role == "admin" &&
-                                <TableHead style={{ textWrap: "nowrap" }} className="text-end">Prix Achat</TableHead>
+                                  decoded.role == "admin" &&
+                                  <TableHead style={{ textWrap: "nowrap" }} className="text-end">Prix Achat</TableHead>
                                 }
                                 <TableHead style={{ textWrap: "nowrap" }} className="text-end">Prix Afficher</TableHead>
                                 <TableHead style={{ textWrap: "nowrap" }} className="text-end">Dérnier prix</TableHead>
@@ -1325,16 +1325,16 @@ const Stocks = () => {
                                       <TableCell className="font-mono text-sm text-nowrap" style={{ fontSize: "12px" }}>{item.code_items || '-'}</TableCell>
                                       <TableCell>
                                         <div>
-                                          <div className="font-medium text-nowrap" style={{ fontSize: "10px",textTransform:"uppercase" }}>{item.designation}</div>
+                                          <div className="font-medium text-nowrap" style={{ fontSize: "10px", textTransform: "uppercase" }}>{item.designation}</div>
                                         </div>
                                       </TableCell>
                                       <TableCell>
                                         <Badge variant="outline" style={{ fontSize: "10px" }} className=" text-nowrap uppercase">{item.categorie}</Badge>
                                       </TableCell>
                                       <TableCell >
-                                        <Badge variant="outline"  style={{ fontSize: "10px" }} className=" text-nowrap uppercase">{item?.family?.origine?.pays || '-'}</Badge>
+                                        <Badge variant="outline" style={{ fontSize: "10px" }} className=" text-nowrap uppercase">{item?.family?.origine?.pays || '-'}</Badge>
                                       </TableCell>
-                                      <TableCell  style={{ fontSize: "10px" }} className=" text-nowrap uppercase font-semibold">{item.marque_produit}</TableCell>
+                                      <TableCell style={{ fontSize: "10px" }} className=" text-nowrap uppercase font-semibold">{item.marque_produit}</TableCell>
                                       <TableCell style={{ fontSize: "10px" }} className=" text-nowrap uppercase font-semibold">{item.family?.parent?.parent?.family_name || '-'}</TableCell>
                                       <TableCell style={{ fontSize: "10px" }} className=" text-nowrap uppercase font-semibold">{item.family?.parent?.family_name || '-'}</TableCell>
                                       <TableCell style={{ fontSize: "10px" }} className=" text-nowrap uppercase font-semibold">{item.family?.family_name || '-'}</TableCell>
@@ -1376,11 +1376,11 @@ const Stocks = () => {
                                       </TableCell>
                                       <TableCell className="font-mono text-center text-sm " style={{ fontSize: "12px" }}>{item.emplacement}</TableCell>
                                       {
-    decoded.role == "admin" &&
-                                      <TableCell className="text-nowrap text-end font-semibold" style={{ fontSize: "11px" }} > {formatNumber(item.prix_achat) || 0} Ar</TableCell>
+                                        decoded.role == "admin" &&
+                                        <TableCell className="text-nowrap text-end font-semibold" style={{ fontSize: "11px" }} > {formatNumber(item.prix_achat) || 0} Ar</TableCell>
                                       }
                                       <TableCell className="text-nowrap text-end font-semibold" style={{ fontSize: "11px" }}>{formatNumber(item.prix_affiche) || 0} Ar</TableCell>
-                                      <TableCell className="text-nowrap text-end font-semibold"  style={{ fontSize: "11px" }}>{formatNumber(item.dernier_prix) || 0} Ar</TableCell>
+                                      <TableCell className="text-nowrap text-end font-semibold" style={{ fontSize: "11px" }}>{formatNumber(item.dernier_prix) || 0} Ar</TableCell>
 
 
                                       <TableCell className="text-center">
@@ -1391,7 +1391,7 @@ const Stocks = () => {
                                             onClick={(e) => { handleEditItem(e, item) }}
                                             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                                           >
-                                            <Edit className="h-2 w-2" size={1}/>
+                                            <Edit className="h-2 w-2" size={1} />
                                           </Button>
                                           <Button
                                             variant="ghost"
@@ -1477,8 +1477,8 @@ const Stocks = () => {
         <TabsContent value="entrees" className="space-y-3">
           {/* Bouton ajouter entrée */}
           <div className="flex justify-between items-center">
-            <h2 className="text-xm font-semibold" style={{fontSize:"13px"}}>Entrées de Stock</h2>
-            <Button onClick={() => setIsCreateEntreeModalOpen(true)}  style={{fontSize:"12px"}} className="bg-blue-950 hover:bg-blue-700 rounded">
+            <h2 className="text-xm font-semibold" style={{ fontSize: "13px" }}>Entrées de Stock</h2>
+            <Button onClick={() => setIsCreateEntreeModalOpen(true)} style={{ fontSize: "12px" }} className="bg-blue-950 hover:bg-blue-700 rounded">
               <Plus className="h-4 w-4 mr-2" />
               Nouvelle entrée
             </Button>
@@ -1724,25 +1724,25 @@ const Stocks = () => {
                 </div>
                 <div className="grid grid-cols-3 gap-10 p-4 bg-gray-50 rounded-lg">
                   {
-    decoded.role == "admin" &&
-                  <div className="text-center">
-                    <p className="text-sm  text-nowrap text-gray-600">Prix d'achat</p>
-                    <p className="text-lg font-bold text-nowrap text-red-600">{formatNumber(selectedItem.prix_achat)} Ar</p>
-                  </div>
-}
+                    decoded.role == "admin" &&
+                    <div className="text-center">
+                      <p className="text-sm  text-nowrap text-gray-600">Prix d'achat</p>
+                      <p className="text-lg font-bold text-nowrap text-red-600">{formatNumber(selectedItem.prix_achat)} Ar</p>
+                    </div>
+                  }
                   <div className="text-center">
                     <p className="text-sm text-nowrap text-gray-600">Prix de vente</p>
                     <p className="text-lg text-nowrap font-bold text-green-600">{formatNumber(selectedItem.prix_affiche)} Ar</p>
                   </div>
                   {
-    decoded.role == "admin" &&
+                    decoded.role == "admin" &&
 
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600">Marge</p>
-                    <p className="text-lg font-bold text-blue-600">
-                      {((selectedItem.prix_affiche - selectedItem.prix_achat) / selectedItem.prix_achat * 100).toFixed(1)}%
-                    </p>
-                  </div>
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600">Marge</p>
+                      <p className="text-lg font-bold text-blue-600">
+                        {((selectedItem.prix_affiche - selectedItem.prix_achat) / selectedItem.prix_achat * 100).toFixed(1)}%
+                      </p>
+                    </div>
                   }
                 </div>
               </div>
@@ -1860,7 +1860,7 @@ const Stocks = () => {
               />
               <div onClick={() => { setSimpleClient(!simpleClient) }} className={` ${String(selectedClient?.id) == "newClient" ? "flex" : "hidden"}  items-center bg-blue-100 gap-4 p-1 cursor-pointer  text-sm px-2`}>
                 <Input type="checkbox" checked={simpleClient} readOnly id="tva" className="h-4 w-4" />
-                Enrégistrer le client 
+                Enrégistrer le client
 
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -2343,7 +2343,7 @@ const Stocks = () => {
           <DialogHeader>
             <DialogTitle>Option pour la facturation</DialogTitle>
             <DialogDescription>
-              Vous pour créer ou imprimer directement un facture icizy !
+              Vous pour créer ou imprimer directement un facture ici !
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

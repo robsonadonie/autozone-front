@@ -158,17 +158,17 @@ import Invoices from "./Invoices";
 const Clients = () => {
   const loadingClient = useSelector((state: RootState) => state.ClientSlice.loading)
   const AllInvoices = useSelector((state: RootState) => state.InvoicesSlice)
-   
-     const dispatch = useDispatch<AppDispatch>()
-   
-     const [invoiceNumber, setInvoiceNumber] = useState("");
-     useEffect(() => {
-       dispatch(InvoicesAsync())
-       const lastNumber = (AllInvoices?.data.length != 0 ?(AllInvoices?.data[0]?.list[0]?.numFacture)?.split("-")[2] : undefined); // tu peux remplacer par un vrai numéro depuis une base
-       const newInvoice = generateInvoiceNumber(lastNumber);
-       setInvoiceNumber(newInvoice);
-     }, []);
- 
+
+  const dispatch = useDispatch<AppDispatch>()
+
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+  useEffect(() => {
+    dispatch(InvoicesAsync())
+    const lastNumber = (AllInvoices?.data.length != 0 ? (AllInvoices?.data[0]?.list[0]?.numFacture)?.split("-")[2] : undefined); // tu peux remplacer par un vrai numéro depuis une base
+    const newInvoice = generateInvoiceNumber(lastNumber);
+    setInvoiceNumber(newInvoice);
+  }, []);
+
 
   const OneUser = useSelector((state: RootState) => state.OneUserSlice)
   const [decoded, setDecoded] = useState({
@@ -277,7 +277,7 @@ const Clients = () => {
 
   const VentesStock = useSelector((state: RootState) => state.VentesSlice.data)
 
-  const AllClient = useSelector((state: RootState) => state.ClientSlice.data).filter((client) =>client.vente.length > 0 &&  client.status =="fidele" )
+  const AllClient = useSelector((state: RootState) => state.ClientSlice.data).filter((client) => client.vente.length > 0 && client.status == "fidele")
 
 
   const [isCreateInvoice, setIsCreateInvoice] = useState(false);
@@ -337,7 +337,7 @@ const Clients = () => {
   const overlayDrop3 = useRef(null) as any;
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
- 
+
   const [createFacture, setCreateFacture] = useState([]);
   const resetForms = () => {
     setNouvelleVente({
@@ -622,7 +622,7 @@ const Clients = () => {
   }, []);
 
   return (
-    <div className="space-y-3 px-3 "> 
+    <div className="space-y-3 px-3 ">
       <Card>
         <CardHeader>
           <div>
@@ -641,12 +641,12 @@ const Clients = () => {
               />
             </div>
 
-            <div className="flex gap-2"> 
+            <div className="flex gap-2">
               <Button onClick={refresh} variant="outline" style={{ borderRadius: "2px" }}>
                 <RefreshCcw className="h-4 w-4 mr-2" />
               </Button>
               <Button
-                 style={{ fontSize: "13px" }} className="py-0 rounded"
+                style={{ fontSize: "13px" }} className="py-0 rounded"
                 onClick={() => {
                   setEditingClient(null);
                   setIsClientFormOpen(true);
@@ -689,7 +689,7 @@ const Clients = () => {
                         <TableCell>
                           <div className="flex items-center gap-1" style={{ fontSize: "13px" }}>
                             {/* <Phone className="h-3.5 w-3.5 text-muted-foreground" /> */}
-                            {client.telephone  || "Non renseigné"}
+                            {client.telephone || "Non renseigné"}
                           </div>
                         </TableCell>
                         <TableCell className="py-1">
@@ -787,7 +787,7 @@ const Clients = () => {
         onSubmit={handleClientSubmit}
         initialData={editingClient}
       />
- 
+
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <form action="" onSubmit={CreateVente}>
@@ -859,10 +859,10 @@ const Clients = () => {
               }
 
               <div className="grid grid-cols-2 gap-4">
- 
+
                 <div>
                   <label className="text-sm font-medium mb-1 block">Mode de paiement</label>
-           
+
 
                   <select name="" id="mode" className="block" defaultValue={nouvelleVente.mode_paiement} onChange={(e) => handleChangeVente('mode_paiement', e.target.value)} style={{ fontSize: "13px" }}>
                     <option value="" >-- Sélectionner --</option>
@@ -903,11 +903,11 @@ const Clients = () => {
           <DialogHeader>
             <DialogTitle>Option pour la facturation</DialogTitle>
             <DialogDescription>
-              Vous pour créer ou imprimer directement un facture icizy !
+              Vous pour créer ou imprimer directement un facture ici !
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setIsCreateInvoice(true), CreateMoreInvoices(),reactToPrintFn() }}>
+            <Button variant="outline" onClick={() => { setIsCreateInvoice(true), CreateMoreInvoices(), reactToPrintFn() }}>
               <EditIcon />
               {
 

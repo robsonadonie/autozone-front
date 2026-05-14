@@ -1,4 +1,4 @@
- import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Search, Calendar, Plus, Eye, Edit, Trash2, FileText, Filter, X, User, MapPin, Phone, Mail, Settings, CalendarIcon, Package, Tag, Users, Euro, RefreshCcw, XIcon, Printer, PrinterIcon, EditIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -171,12 +171,144 @@ interface FilterState {
 }
 
 const Vente = () => {
+  const dispatch = useDispatch<AppDispatch>()
+
+  // All state and selectors at the top
   const loadingVente = useSelector((state: RootState) => state.VentesSlice.loading)
   const AllInvoices = useSelector((state: RootState) => state.InvoicesSlice)
   const AddInvoices = useSelector((state: RootState) => state.AddInvoicesSlice)
-  const dispatch = useDispatch<AppDispatch>()
+  const OneUser = useSelector((state: RootState) => state.OneUserSlice)
+  const DataStock = useSelector((state: RootState) => state.StockSlice.data)
+  const UpVentes = useSelector((state: RootState) => state.UpVentesSlice)
+  const AddEntreStock = useSelector((state: RootState) => state.AddEntreStockSlice)
+  const AddVentesStock = useSelector((state: RootState) => state.AddVentesSlice)
+  const VentesStock = useSelector((state: RootState) => state.VentesSlice.data)
+  const Mark = useSelector((state: RootState) => state.MarkSlice.data)
+  const MarkProd = useSelector((state: RootState) => state.MarkProductSlice.data)
+  const Modele = useSelector((state: RootState) => state.ModeleSlice.data)
+  const Serie = useSelector((state: RootState) => state.SerieSlice.data)
+  const AllClient = useSelector((state: RootState) => state.ClientSlice.data).filter((client) => client.status == "fidele")
 
   const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [decoded, setDecoded] = useState({
+    id: 0,
+    email: "",
+    status: "1",
+    createdAt: "",
+    role: "",
+    person: {
+      id: 0,
+      name: "",
+      createdAt: "",
+      deletedAt: null,
+    }
+  }) as any;
+
+  const [articles, setArticles] = useState([])
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [action, setAction] = useState(false);
+  const [createFacture, setCreateFacture] = useState([]);
+  const [created, setCreated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [sortConfig, setSortConfig] = useState<{ field: SortField; order: SortOrder }>({
+    field: "date",
+    order: "desc"
+  });
+  const [productFormData, setProductFormData] = useState<ProductFormData>({
+    codeBarres: '',
+    codeItems: '',
+    designation: '',
+    origine: '',
+    marqueProduit: '',
+    marque: '',
+    modele: '',
+    serie: '',
+    categorie: '',
+    prixAffiche: 0,
+    dernierPrix: 0,
+    emplacement: '',
+    quantiteStock: 0,
+    quantiteMinimale: 0,
+    description: ''
+  });
+  const [stockSelected, SetstockSelected] = useState(null);
+  const [updateDate, setUpdateDate] = useState(null)
+  const [DataStockCateg, setDataStockCateg] = useState(DataStock)
+  const [searchCateg, setSearchCateg] = useState("")
+  const [isCreateInvoice, setIsCreateInvoice] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [stockChecked, setStockChecked] = useState([])
+  const [searchValue, SetSearchValue] = useState("");
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDismissDialogOpen, setIsDismissDialogOpen] = useState(false);
+  const [isCreateInvoiceSelected, setIsCreateInvoiceSelected] = useState(false);
+  const [selectedVente, setSelectedVente] = useState<VenteItem | any>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [addTVA, setAddTVA] = useState(false)
+  const [simpleClient, setSimpleClient] = useState(false)
+  const [selectedArticles, setSelectedArticles] = useState([{
+    quantite: 0,
+    prix_unitaire: '',
+    status: "",
+    mode_paiement: "",
+    TVA: 0,
+    total_HT: 0,
+    total_TTC: 0,
+    admin: decoded?.id,
+    client: selectedClient?.id,
+    dataClient: [],
+    stock: 0
+  }]) as any;
+
+  const [nouvelleVente, setNouvelleVente] = useState({
+    quantite: 0,
+    prix_unitaire: '',
+    status: "",
+    mode_paiement: "",
+    TVA: 0,
+    total_HT: 0,
+    total_TTC: 0,
+    admin: decoded?.id,
+    client: selectedClient?.id,
+    stock: 0,
+    dataClient: []
+  })
+
+  const tva = useRef() as any
+  const ttc = useRef() as any
+  const ht = useRef() as any
+  const search = useRef() as any
+  const { toast } = useToast();
+
+  const total_HT = useMemo(() => {
+    return selectedArticles.reduce((acc, item) => acc + (Number(item.prix_unitaire || 0) * Number(item.quantite || 0)), 0);
+  }, [selectedArticles]);
+
+  let DateNow = new Date(format(new Date(), "MM/dd/yyyy"))
+
+  const [filters, setFilters] = useState<FilterState>({
+    startDate: DateNow,
+    endDate: undefined,
+    category: "all",
+    marqueVehicule: "all",
+    marqueProduit: "all",
+    searchTerm: "",
+    statut: "all",
+    vendeur: "all",
+    client: "all",
+    typeVente: "all",
+    region: "all",
+    categories: [],
+  });
+
   useEffect(() => {
     dispatch(InvoicesAsync())
     const lastNumber = (AllInvoices?.data.length != 0 ? (AllInvoices?.data[0]?.list[0]?.numFacture)?.split("-")[2] : undefined);
@@ -204,50 +336,10 @@ const Vente = () => {
   }
 
 
-  const OneUser = useSelector((state: RootState) => state.OneUserSlice)
-  const [decoded, setDecoded] = useState({
-    id: 0,
-    email: "",
-    status: "1",
-    createdAt: "",
-    role: "",
-    person: {
-      id: 0,
-      name: "",
-      createdAt: "",
-      deletedAt: null,
-    }
-  }) as any;
 
 
 
   const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    if (token) {
-      const decoded = jwtDecode(token);
-      setDecoded(decoded as any)
-    }
-  }, [])
-
-  useEffect(() => {
-    // dispatch(OneUserAsync(decoded.id))
-  }, [decoded.id])
-  useEffect(() => {
-    // dispatch(OneUserAsync(decoded.id))
-  }, [])
-
-
-
-
-  let DateNow = new Date(format(new Date(), "MM/dd/yyyy"))
-
-
-
-
-
-
-  const [articles, setArticles] = useState([])
   const addMore = () => {
     setSelectedArticles([...selectedArticles, {
       quantite: 0,
@@ -308,93 +400,10 @@ const Vente = () => {
   });
 
 
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [action, setAction] = useState(false);
-  const [createFacture, setCreateFacture] = useState([]);
-  const [created, setCreated] = useState(false);
-
-  const [filters, setFilters] = useState<FilterState>({
-    startDate: DateNow,
-    endDate: undefined,
-    category: "all",
-    marqueVehicule: "all",
-    marqueProduit: "all",
-    searchTerm: "",
-    statut: "all",
-    vendeur: "all",
-    client: "all",
-    typeVente: "all",
-    region: "all",
-    categories: [],
-  });
-
-  const search = useRef() as any
-
-  const [searchValue, SetSearchValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [sortConfig, setSortConfig] = useState<{ field: SortField; order: SortOrder }>({
-    field: "date",
-    order: "desc"
-  });
 
 
 
-  const [productFormData, setProductFormData] = useState<ProductFormData>({
-    codeBarres: '',
-    codeItems: '',
-    designation: '',
-    origine: '',
-    marqueProduit: '',
-    marque: '',
-    modele: '',
-    serie: '',
-    categorie: '',
-    prixAffiche: 0,
-    dernierPrix: 0,
-    emplacement: '',
-    quantiteStock: 0,
-    quantiteMinimale: 0,
-    description: ''
-  });
-  const [stockSelected, SetstockSelected] = useState(null);
 
-  const activeFiltersCount = useMemo(() => {
-    let count = 0;
-    if (filters.startDate) count++;
-    if (filters.endDate) count++;
-    if (filters.category !== "all") count++;
-    if (filters.marqueVehicule !== "all") count++;
-    if (filters.marqueProduit !== "all") count++;
-    if (filters.statut !== "all") count++;
-    if (filters.vendeur !== "all") count++;
-    if (filters.client !== "all") count++;
-    if (filters.typeVente !== "all") count++;
-    if (filters.region !== "all") count++;
-    if (filters.prixMin) count++;
-    if (filters.prixMax) count++;
-    if (filters.quantiteMin) count++;
-    if (filters.quantiteMax) count++;
-    if (filters.margeMin) count++;
-    if (filters.margeMax) count++;
-    if (filters.categories.length > 0) count++;
-    return count;
-  }, [filters]);
-
-
-
-  const [updateDate, setUpdateDate] = useState(null)
-  const DataStock = useSelector((state: RootState) => state.StockSlice.data)
-  const UpVentes = useSelector((state: RootState) => state.UpVentesSlice)
-  const [DataStockCateg, setDataStockCateg] = useState(DataStock)
-
-  const [searchCateg, setSearchCateg] = useState("")
-
-  const contentRef = useRef<HTMLDivElement>(null);
-  const reactToPrintFn = useReactToPrint({ contentRef })
-
-
-  const AddEntreStock = useSelector((state: RootState) => state.AddEntreStockSlice)
 
   const venteAnnuler = (selectedVente) => {
 
@@ -432,10 +441,10 @@ const Vente = () => {
     })
     dispatch(AddMoreInvoicesAsync(newInvoice as any))
   }
-  const [isCreateInvoice, setIsCreateInvoice] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const reactToPrintFn = useReactToPrint({ contentRef })
 
 
-  const AllClient = useSelector((state: RootState) => state.ClientSlice.data).filter((client) => client.status == "fidele")
 
 
 
@@ -516,13 +525,151 @@ const Vente = () => {
     setDataStockCateg(DataStock)
   }, [DataStock])
 
-  const VentesStock = useSelector((state: RootState) => state.VentesSlice.data)
-  const Mark = useSelector((state: RootState) => state.MarkSlice.data)
-  const MarkProd = useSelector((state: RootState) => state.MarkProductSlice.data)
-  const Modele = useSelector((state: RootState) => state.ModeleSlice.data)
-  const Serie = useSelector((state: RootState) => state.SerieSlice.data)
 
-  const AddVentesStock = useSelector((state: RootState) => state.AddVentesSlice)
+  // Move data derivation here
+
+  const filteredVentes = useMemo(() => {
+    let data = VentesStock;
+
+    if (searchValue !== "") {
+      data = data.filter((item) =>
+        item?.mode_paiement?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        item?.stock?.designation.toLowerCase().includes(searchValue.toLowerCase()) ||
+        item?.stock?.categorie.toLowerCase().includes(searchValue.toLowerCase()) ||
+        item?.stock?.emplacement.toLowerCase().includes(searchValue.toLowerCase()) ||
+        item?.client?.name?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        item?.client?.firstName?.toLowerCase().includes(searchValue.toLowerCase())
+      );
+    }
+
+    return data
+      .filter((vente) => {
+        let NextDate = () => {
+          const date = new Date(filters.endDate);
+          date.setDate(date.getDate() + 1);
+          return date;
+        };
+        if (filters.startDate && new Date(vente.createdAt) < new Date(filters.startDate)) {
+          return false;
+        }
+        if (filters.endDate && new Date(vente.createdAt) >= new Date(NextDate())) {
+          return false;
+        }
+        if (filters.marqueProduit !== "all" && vente.stock.family.family_name !== filters.marqueProduit) {
+          return false;
+        }
+        if (filters.marqueVehicule !== "all" && vente.stock.family.parent?.parent?.family_name !== filters.marqueVehicule) {
+          return false;
+        }
+        if (filters.statut !== "all" && vente.status !== filters.statut) {
+          return false;
+        }
+        if (filters.typeVente !== "all" && vente.mode_paiement !== filters.typeVente) {
+          return false;
+        }
+        if (filters.vendeur !== "all" && vente.admin.name !== filters.vendeur) {
+          return false;
+        }
+
+        if (filters.client !== "all" && vente.client.name !== filters.client) {
+          return false;
+        }
+
+        if (filters.region !== "all" && !vente.client.adresse.includes(filters.region)) {
+          return false;
+        }
+
+        if (filters.prixMin !== undefined && vente.total_HT < filters.prixMin) {
+          return false;
+        }
+        if (filters.prixMax !== undefined && vente.total_HT > filters.prixMax) {
+          return false;
+        }
+
+        if (filters.quantiteMin !== undefined && vente.quantite < filters.quantiteMin) {
+          return false;
+        }
+        if (filters.quantiteMax !== undefined && vente.quantite > filters.quantiteMax) {
+          return false;
+        }
+
+        const margin = ((vente.stock.prix_affiche - vente.stock?.prix_achat) / vente.stock?.prix_achat) * 100;
+        if (filters.margeMin !== undefined && margin < filters.margeMin) {
+          return false;
+        }
+        if (filters.margeMax !== undefined && margin > filters.margeMax) {
+          return false;
+        }
+
+        if (filters.categories.length > 0 && !filters.categories.some(cat => (vente.stock.categorie.toUpperCase()).includes(cat.toUpperCase()))) {
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (!sortField) return 0;
+        const aValue = sortField === "designation" ? a.stock.designation : a[sortField];
+        const bValue = sortField === "designation" ? b.stock.designation : b[sortField];
+
+        if (typeof aValue === "string" && typeof bValue === "string") {
+          return sortOrder === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        }
+
+        if (typeof aValue === "number" && typeof bValue === "number") {
+          return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
+        }
+
+        return 0;
+      });
+  }, [VentesStock, searchValue, filters, sortField, sortOrder]);
+
+  const paginatedVentes = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredVentes.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredVentes, currentPage]);
+
+  const totalPages = Math.ceil(filteredVentes.length / itemsPerPage);
+
+  const statistics = useMemo(() => {
+    const totalAchat = filteredVentes.reduce((acc, vente) => acc + (vente.stock?.prix_achat * vente.quantite), 0);
+    const totalVentes = filteredVentes.reduce((acc, vente) => acc + (vente.total_HT), 0);
+    const commission = totalVentes * 0.05;
+    const profit = totalVentes - totalAchat;
+
+    return {
+      totalAchat,
+      totalVentes,
+      commission,
+      profit
+    };
+  }, [filteredVentes]);
+
+  const categories = VentesStock.map((e) => e.stock.categorie)
+  const marques = Array.from(new Set(VentesStock.map(v => v.marqueVehicule)));
+  const fil = (stockChecked.length == 0 ? filteredVentes : filteredVentes.filter((item) => item.client.id == stockChecked[0].client.id && new Date(item.createdAt).toLocaleDateString() == new Date(stockChecked[0].createdAt).toLocaleDateString()))
+
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (filters.startDate) count++;
+    if (filters.endDate) count++;
+    if (filters.category !== "all") count++;
+    if (filters.marqueVehicule !== "all") count++;
+    if (filters.marqueProduit !== "all") count++;
+    if (filters.statut !== "all") count++;
+    if (filters.vendeur !== "all") count++;
+    if (filters.client !== "all") count++;
+    if (filters.typeVente !== "all") count++;
+    if (filters.region !== "all") count++;
+    if (filters.prixMin) count++;
+    if (filters.prixMax) count++;
+    if (filters.quantiteMin) count++;
+    if (filters.quantiteMax) count++;
+    if (filters.margeMin) count++;
+    if (filters.margeMax) count++;
+    if (filters.categories.length > 0) count++;
+    return count;
+  }, [filters]);
+
 
   const getAvailableMarques = () => {
     if (!productFormData.marqueProduit) return [];
@@ -542,15 +689,6 @@ const Vente = () => {
 
     setNouvelleVente(prev => ({ ...prev, [item]: value }));
   }
-  const [addTVA, setAddTVA] = useState(false)
-  const [simpleClient, setSimpleClient] = useState(false)
-  const tva = useRef() as any
-  const ttc = useRef() as any
-  const ht = useRef() as any
-
-  const [mockVentesData, setMockVentesData] = useState(VentesStock)
-
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
 
 
@@ -562,9 +700,6 @@ const Vente = () => {
     nouvelleVente.client = selectedClient?.id
   }, [selectedClient])
 
-  useEffect(() => {
-    applyFilters()
-  }, [VentesStock])
   useEffect(() => {
     if (!AddEntreStock.loading && AddEntreStock.status == "ok") {
 
@@ -619,91 +754,6 @@ const Vente = () => {
     dispatch(StockAsync())
   }
 
-  const applyFilters = () => {
-    setIsLoading(true);
-    let value = searchValue
-    let data = []
-
-    if (value != '') {
-      const filtered = mockVentesData.filter((item) =>
-        (item?.mode_paiement?.toLowerCase()).includes(value.toLowerCase()) || (item?.stock?.designation.toLowerCase()).includes(value.toLowerCase()) || (item?.stock?.categorie.toLowerCase()).includes(value.toLowerCase()) || (item?.stock?.emplacement.toLowerCase()).includes(value.toLowerCase()) || (item?.client?.name?.toLowerCase())?.includes(value.toLowerCase()) || (item?.client?.firstName?.toLowerCase())?.includes(value.toLowerCase()) || (item?.stock?.designation.toLowerCase()).includes(value.toLowerCase())
-      )
-
-      data = filtered
-    } else {
-      data = VentesStock
-    };
-
-    const filteredData = data.filter((vente) => {
-      let NextDate = () => {
-        const date = new Date(filters.endDate);
-        date.setDate(date.getDate() + 1);
-        return date
-      };
-      if (filters.startDate && new Date((vente.createdAt)) <= new Date(filters.startDate)) {
-        return false;
-      }
-      if (filters.endDate && new Date(new Date(vente.createdAt)) >= new Date(new Date(NextDate()))) {
-        return false;
-      }
-      if (filters.marqueProduit !== "all" && vente.stock.family.family_name !== filters.marqueProduit) {
-        return false;
-      }
-      if (filters.marqueVehicule !== "all" && vente.stock.family.parent?.parent?.family_name !== filters.marqueVehicule) {
-        return false;
-      }
-      if (filters.statut !== "all" && vente.status !== filters.statut) {
-        return false;
-      }
-      if (filters.typeVente !== "all" && vente.mode_paiement !== filters.typeVente) {
-        return false;
-      }
-      if (filters.vendeur !== "all" && vente.admin.name !== filters.vendeur) {
-        return false;
-      }
-
-      if (filters.client !== "all" && vente.client.name !== filters.client) {
-        return false;
-      }
-
-      if (filters.region !== "all" && !vente.client.adresse.includes(filters.region)) {
-        return false;
-      }
-
-      if (filters.prixMin !== undefined && vente.total_HT < filters.prixMin) {
-        return false;
-      }
-      if (filters.prixMax !== undefined && vente.total_HT > filters.prixMax) {
-        return false;
-      }
-
-      if (filters.quantiteMin !== undefined && vente.quantite < filters.quantiteMin) {
-        return false;
-      }
-      if (filters.quantiteMax !== undefined && vente.quantite > filters.quantiteMax) {
-        return false;
-      }
-
-      const margin = ((vente.stock.prix_affiche - vente.stock?.prix_achat) / vente.stock?.prix_achat) * 100;
-      if (filters.margeMin !== undefined && margin < filters.margeMin) {
-        return false;
-      }
-      if (filters.margeMax !== undefined && margin > filters.margeMax) {
-        return false;
-      }
-
-      if (filters.categories.length > 0 && !filters.categories.some(cat => ((vente.stock.categorie).toUpperCase()).includes((cat).toUpperCase()))) {
-        return false;
-      }
-      return true;
-    });
-
-
-
-    setMockVentesData(filteredData)
-  };
-  useEffect(() => { applyFilters() }, [searchValue])
-  useEffect(() => { applyFilters() }, [filters])
 
 
   const resetForms = () => {
@@ -721,10 +771,10 @@ const Vente = () => {
     } as any)
   }
   const marquesProduit = useMemo(() =>
-    Array.from(new Set(mockVentesData.map(vente => vente.marqueProduit))),
+    Array.from(new Set(VentesStock.map(vente => vente.marqueProduit))),
     []);
   const marquesVehicule = useMemo(() =>
-    Array.from(new Set(mockVentesData.map(vente => vente.marqueVehicule))),
+    Array.from(new Set(VentesStock.map(vente => vente.marqueVehicule))),
     []);
   const statutOptions = ["Validée", "En attente", "Annulée", "Retournée"];
   const vendeurOptions = ["Jean Dupont", "Marie Martin", "Pierre Durand", "Sophie Bernard"];
@@ -733,19 +783,6 @@ const Vente = () => {
   const regionOptions = ["Nord", "Sud", "Est", "Ouest", "Centre"];
 
 
-  const [nouvelleVente, setNouvelleVente] = useState({
-    quantite: 0,
-    prix_unitaire: '',
-    status: "",
-    mode_paiement: "",
-    TVA: parseFloat(tva?.current?.value as any),
-    total_HT: ht?.current?.value as any,
-    total_TTC: ttc?.current?.value as any,
-    admin: decoded?.id,
-    client: selectedClient?.id,
-    stock: 0,
-    dataClient: []
-  })
   useEffect(() => {
     const newValue = []
     selectedArticles.map((items: any) => (
@@ -846,30 +883,6 @@ const Vente = () => {
   };
 
 
-
-  const [startDate, setStartDate] = useState<Date | undefined>(DateNow);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedMarque, setSelectedMarque] = useState("all");
-  const [ventesData, setVentesData] = useState<VenteItem[]>(mockVentesData);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDismissDialogOpen, setIsDismissDialogOpen] = useState(false);
-  const [isCreateInvoiceSelected, setIsCreateInvoiceSelected] = useState(false);
-  const [selectedVente, setSelectedVente] = useState<VenteItem | any>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const [showFilters, setShowFilters] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  const { toast } = useToast();
-
-  const itemsPerPage = 10;
-  const [sortField, setSortField] = useState<string | null>(null);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-
   const handleSort = (field: string) => {
     if (sortField === field) {
       // Toggle sort order if the same field is clicked
@@ -880,73 +893,12 @@ const Vente = () => {
       setSortOrder("asc");
     }
   };
-  const [stockChecked, setStockChecked] = useState([])
-
-  let fil = (stockChecked.length == 0 ? mockVentesData : mockVentesData.filter((item) => item.client.id == stockChecked[0].client.id && new Date(item.createdAt).toLocaleDateString() == new Date(stockChecked[0].createdAt).toLocaleDateString()))
-
-  // Filtrage et tri des données
-  const filteredVentes = useMemo(() => {
-    return fil
-      .filter(vente => {
-        const matchesSearch = !searchTerm ||
-          vente.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          vente.marqueProduit.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          vente.marqueVehicule.toLowerCase().includes(searchTerm.toLowerCase());
-
-        const matchesCategory = selectedCategory === "all" || vente.categorie === selectedCategory;
-        const matchesMarque = selectedMarque === "all" || vente.marqueVehicule === selectedMarque;
-
-        const venteDate = new Date(vente.date);
-        const matchesDateRange = (!startDate || venteDate >= startDate) &&
-          (!endDate || venteDate <= endDate);
-
-        return matchesSearch && matchesCategory && matchesMarque && matchesDateRange && vente.statut === "active";
-      })
-      .sort((a, b) => {
-        const aValue = a[sortField];
-        const bValue = b[sortField];
-
-        if (typeof aValue === "string" && typeof bValue === "string") {
-          return sortOrder === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-        }
-
-        if (typeof aValue === "number" && typeof bValue === "number") {
-          return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
-        }
-
-        return 0;
-      });
-    applyFilters()
-  }, [ventesData, searchTerm, selectedCategory, selectedMarque, startDate, endDate, sortField, sortOrder]);
-
-  const paginatedVentes = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredVentes.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredVentes, currentPage]);
-
-  const totalPages = Math.ceil(filteredVentes.length / itemsPerPage);
-
-  const statistics = useMemo(() => {
-    const totalAchat = mockVentesData.reduce((acc, vente) => acc + (vente.stock?.prix_achat * vente.quantite), 0);
-    const totalVentes = mockVentesData.reduce((acc, vente) => acc + (vente.total_HT), 0);
-    const commission = totalVentes * 0.05;
-    const profit = totalVentes - totalAchat;
-
-    return {
-      totalAchat,
-      totalVentes,
-      commission,
-      profit
-    };
-  }, [mockVentesData]);
 
 
 
 
 
   // const categories = Array.from(new Set(mockVentesData.map(v => v.categorie)));
-  const categories = ventesData.map((e) => e.stock.categorie)
-  const marques = Array.from(new Set(mockVentesData.map(v => v.marqueVehicule)));
 
   function deleteDoublonsCateg(f) {
     let rest = []
@@ -965,19 +917,6 @@ const Vente = () => {
 
 
 
-  const [selectedArticles, setSelectedArticles]: any = useState([{
-    quantite: 0,
-    prix_unitaire: '',
-    status: "",
-    mode_paiement: "",
-    TVA: 0,
-    total_HT: 0,
-    total_TTC: 0,
-    admin: decoded?.id,
-    client: selectedClient?.id,
-    dataClient: [],
-    stock: 0
-  }])
 
 
   const checkBox = (vente) => {
@@ -992,9 +931,9 @@ const Vente = () => {
 
   }
   const checkAll = () => {
-    let rest = (stockChecked.length == 0 ? mockVentesData : mockVentesData.filter((item) => item.client.id == stockChecked[0].client.id && new Date(item.createdAt).toLocaleDateString() == new Date(stockChecked[0].createdAt).toLocaleDateString()))
+    let rest = (stockChecked.length == 0 ? filteredVentes : filteredVentes.filter((item) => item.client.id == stockChecked[0].client.id && new Date(item.createdAt).toLocaleDateString() == new Date(stockChecked[0].createdAt).toLocaleDateString()))
     if (stockChecked.length != rest.length) {
-      setStockChecked((stockChecked.length == 0 ? mockVentesData : rest))
+      setStockChecked((stockChecked.length == 0 ? filteredVentes : rest))
     } else {
       setStockChecked([])
     }
@@ -1020,15 +959,12 @@ const Vente = () => {
   useEffect(() => {
     if (!AddInvoices.loading && AddInvoices.status == "ok") {
       setIsCreateInvoice(false)
-
-      fil = (stockChecked.length == 0 ? mockVentesData : mockVentesData.filter((item) => item.client.id == stockChecked[0].client.id && new Date(item.createdAt).toLocaleDateString() == new Date(stockChecked[0].createdAt).toLocaleDateString()))
       dispatch(VentesAsync())
       dispatch(StockAsync())
       setIsCreateInvoice(false)
       setIsCreateInvoiceSelected(false)
       setStockChecked([])
       dispatch(changeStatus(""))
-      setMockVentesData(mockVentesData)
       toast({
         title: "Facture crée",
         description: "Le nouveau facture a été enregistré avec succès."
@@ -1072,7 +1008,6 @@ const Vente = () => {
 
 
   };
-  const total_HT = (((selectedArticles.map((e: { prix_unitaire: number, quantite: number } | any) => (e.quantite * e.prix_unitaire) as any)).reduce((acc, el) => acc + el) | 0))
 
 
 
@@ -1083,9 +1018,8 @@ const Vente = () => {
 
   const confirmDelete = () => {
     if (selectedVente) {
-      setVentesData(prev => prev.map(v =>
-        v.id === selectedVente.id ? { ...v, statut: "cancelled" as const } : v
-      ));
+      // Typically you'd dispatch a delete async thunk here
+      // dispatch(DeleteVenteAsync(selectedVente.id))
 
       toast({
         title: "Vente supprimée",
@@ -1174,7 +1108,6 @@ const Vente = () => {
     setStartDate(DateNow);
     setEndDate(undefined);
     setCurrentPage(1);
-    setMockVentesData(ventesData)
 
     toast({
       title: "Filtres réinitialisés",
@@ -1193,35 +1126,7 @@ const Vente = () => {
     }
   };
 
-  const sortedData = [...fil].sort((a, b) => {
-    if (!sortField) return 0; // No sorting applied
-
-    const valueA = a[sortField];
-    const valueB = b[sortField];
-
-    if (sortField == "designation") {
-
-      return sortOrder === "asc"
-        ? a.stock.designation.localeCompare(b.stock.designation)
-        : b.stock.designation.localeCompare(a.stock.designation);
-
-    }
-    else {
-
-      if (typeof valueA === "string" && typeof valueB === "string") {
-        return sortOrder === "asc"
-          ? valueA.localeCompare(valueB)
-          : valueB.localeCompare(valueA);
-      }
-      if (typeof valueA === "number" && typeof valueB === "number") {
-        return sortOrder === "asc" ? valueA - valueB : valueB - valueA;
-      }
-    }
-
-
-    return 0;
-  });
-
+  const sortedData = paginatedVentes;
 
   return (
     <div className="space-y-3 py-0 p-3">
@@ -1549,7 +1454,7 @@ const Vente = () => {
             <Card className="mt-2">
               <CardHeader className="w-full">
                 <div className="flex justify-between items-center w-full">
-                  <CardTitle style={{ fontSize: "14px" }}>Liste des ventes ({mockVentesData.length})</CardTitle>
+                  <CardTitle style={{ fontSize: "14px" }}>Liste des ventes ({filteredVentes.length})</CardTitle>
                   <div className="text-sm text-gray-600">
                     Page {currentPage} sur {totalPages}
                   </div>
@@ -1909,30 +1814,30 @@ const Vente = () => {
                   </div>
                 </div>
 
-{
-    decoded.role == "admin" &&
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
-                  <h3 className="text-base font-semibold text-gray-900 mb-3">Analyse financière</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center">
-                      <p className="text-xs font-medium text-gray-600 mb-1">Prix d'achat unitaire</p>
-                      <p className="text-lg font-bold text-red-600">  {((formatNumber(selectedVente.total_HT / selectedVente.quantite) || 0))} ( {selectedVente.quantite}) Ar</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs font-medium text-gray-600 mb-1">Marge brute</p>
-                      <p className="text-lg font-bold text-green-600">
-                        {formatNumber((selectedVente.total_HT / selectedVente.quantite) - selectedVente.stock?.prix_achat)} ( {selectedVente.quantite}) Ar
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs font-medium text-gray-600 mb-1">Taux de marge</p>
-                      <p className="text-lg font-bold text-blue-600">
-                        {(((selectedVente.total_HT - (selectedVente.stock?.prix_achat * selectedVente.quantite)) / selectedVente.total_HT) * 100).toFixed(1)}%
-                      </p>
+                {
+                  decoded.role == "admin" &&
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
+                    <h3 className="text-base font-semibold text-gray-900 mb-3">Analyse financière</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="text-center">
+                        <p className="text-xs font-medium text-gray-600 mb-1">Prix d'achat unitaire</p>
+                        <p className="text-lg font-bold text-red-600">  {((formatNumber(selectedVente.total_HT / selectedVente.quantite) || 0))} ( {selectedVente.quantite}) Ar</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs font-medium text-gray-600 mb-1">Marge brute</p>
+                        <p className="text-lg font-bold text-green-600">
+                          {formatNumber((selectedVente.total_HT / selectedVente.quantite) - selectedVente.stock?.prix_achat)} ( {selectedVente.quantite}) Ar
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs font-medium text-gray-600 mb-1">Taux de marge</p>
+                        <p className="text-lg font-bold text-blue-600">
+                          {(((selectedVente.total_HT - (selectedVente.stock?.prix_achat * selectedVente.quantite)) / selectedVente.total_HT) * 100).toFixed(1)}%
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-}
+                }
               </div>
             )}
 
@@ -2246,7 +2151,7 @@ const Vente = () => {
           <DialogHeader>
             <DialogTitle>Option pour la facturation</DialogTitle>
             <DialogDescription>
-              Vous pour créer ou imprimer directement un facture icizy !
+              Vous pour créer ou imprimer directement un facture ici !
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

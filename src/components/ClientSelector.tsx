@@ -178,7 +178,7 @@ const mockClients: Client[] = AllClient || []
 
       {/* Modal de création de nouveau client */}
       <Dialog open={isNewClientModalOpen} onOpenChange={setIsNewClientModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md bg-white">
           <DialogHeader>
             <DialogTitle>Nouveau client</DialogTitle>
           </DialogHeader>
