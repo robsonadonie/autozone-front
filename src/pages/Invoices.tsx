@@ -410,19 +410,17 @@ const Invoices = () => {
     }
 
     dispatch(AddInvoicesAsync(newInvoices as any))
-
-    // setInvoices(prev => [...prev, newInvoice]);
-    // setIsCreateModalOpen(false);
-    toast({
-      title: "Facture créée",
-      description: `La facture ${newInvoice.id} a été créée avec succès`,
-    });
   };
 
 
   useEffect(() => {
     if (!AddInvoices.loading  && AddInvoices.status =="ok") {
       setDeleteDialog(null)
+      toast({
+        title: "Facture créée",
+        description: "La facture a été créée avec succès",
+      });
+      setIsCreateModalOpen(false);
       dispatch(changeStatus(""))
       // dispatch(InvoicesAsync())
     }
@@ -467,7 +465,11 @@ const Invoices = () => {
   useEffect(() => {
     if (!DelInvoices.loading && DelInvoices.status == "deleted") {
       dispatch(InvoicesAsync())
-      
+      toast({
+        title: "Facture supprimée",
+        description: "La facture a été supprimée avec succès",
+      });
+      setDeleteDialog(null);
       dispatch(changeDeleteInv(''))
       applyFilters()
     }

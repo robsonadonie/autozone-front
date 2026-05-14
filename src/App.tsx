@@ -51,8 +51,8 @@ const App = () => {
           <Sonner />
 
           {/* Routes */}
-           <BrowserRouter >  
-          {/* <HashRouter> */}
+           {/* <BrowserRouter >   */}
+          <HashRouter>
             <Routes>
               {/* Auth routes */}
               <Route path="auth/login" element={<Login />} />
@@ -78,8 +78,8 @@ const App = () => {
               {/* Fallback route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-          {/* </HashRouter> */}
+          {/* </BrowserRouter> */}
+          </HashRouter>
         </TooltipProvider>
       </QueryClientProvider>
     </StrictMode>
