@@ -75,6 +75,7 @@ import { OneUserAsync } from "@/redux/Async/userAuthAsync";
 import { jwtDecode } from "jwt-decode";
 import generateInvoiceNumber from "@/types/num-invoices";
 import { APP_URL } from "../../process.env";
+import { UserAsync } from "@/redux/Async/UserAsync";
 
 // Types
 interface Client {
@@ -172,7 +173,13 @@ interface FilterState {
 
 const Vente = () => {
   const dispatch = useDispatch<AppDispatch>()
+  let DateNow = new Date(format(new Date(), "MM/dd/yyyy"))
 
+    const [startDate, setStartDate] = useState<Date | undefined>(DateNow);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedMarque, setSelectedMarque] = useState("all");
   // All state and selectors at the top
   const loadingVente = useSelector((state: RootState) => state.VentesSlice.loading)
   const AllInvoices = useSelector((state: RootState) => state.InvoicesSlice)
@@ -232,6 +239,8 @@ const Vente = () => {
     quantiteMinimale: 0,
     description: ''
   });
+  const AllUser = useSelector((state: RootState) => state.UserSlice)
+
   const [stockSelected, SetstockSelected] = useState(null);
   const [updateDate, setUpdateDate] = useState(null)
   const [DataStockCateg, setDataStockCateg] = useState(DataStock)
@@ -292,7 +301,7 @@ const Vente = () => {
     return selectedArticles.reduce((acc, item) => acc + (Number(item.prix_unitaire || 0) * Number(item.quantite || 0)), 0);
   }, [selectedArticles]);
 
-  let DateNow = new Date(format(new Date(), "MM/dd/yyyy"))
+
 
   const [filters, setFilters] = useState<FilterState>({
     startDate: DateNow,
@@ -310,6 +319,7 @@ const Vente = () => {
   });
 
   useEffect(() => {
+    dispatch(UserAsync())
     dispatch(InvoicesAsync())
     const lastNumber = (AllInvoices?.data.length != 0 ? (AllInvoices?.data[0]?.list[0]?.numFacture)?.split("-")[2] : undefined);
     const newInvoice = generateInvoiceNumber(lastNumber);
@@ -339,7 +349,22 @@ const Vente = () => {
 
 
 
+
   const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (token) {
+      const decoded = jwtDecode(token);
+      setDecoded(decoded as any)
+    }
+  }, [])
+
+  useEffect(() => {
+    dispatch(OneUserAsync(decoded.id))
+  }, [decoded.id])
+  useEffect(() => {
+    dispatch(OneUserAsync(decoded.id))
+  }, [])
   const addMore = () => {
     setSelectedArticles([...selectedArticles, {
       quantite: 0,
@@ -1081,6 +1106,8 @@ const Vente = () => {
     prix_unitaire: selectedVente?.total_HT / selectedVente?.quantite,
     mode_paiement: selectedVente?.mode_paiement,
   })
+  console.log(decoded);
+  
 
 
 
@@ -1126,14 +1153,15 @@ const Vente = () => {
     }
   };
 
-  const sortedData = paginatedVentes;
+  // const sortedData = paginatedVentes;
+  const sortedData = filteredVentes
 
   return (
     <div className="space-y-3 py-0 p-3">
       {/* En-tête */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold  tracking-tight " style={{ fontSize: "16px" }}>Suivi des Ventes</h1>
+          <h1 className="text-2xl font-bold  tracking-tight " style={{ fontSize: "16px" }}>Suivi des Ventes   {decoded.role}</h1>
         </div>
         <div className="flex items-center gap-8">
 
@@ -1202,14 +1230,14 @@ const Vente = () => {
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
                     <Label className="text-base font-medium" style={{ fontSize: "14px" }}>
-                      Personnel & Clients
+                      Vendeurs
                     </Label>
                   </div>
                   <div className="grid grid-cols-1 gap-4">
 
                     {/* Vendeur */}
                     <div className="space-y-2">
-                      <Label className="text-sm">Vendeur</Label>
+                      {/* <Label className="text-sm">Vendeur</Label> */}
                       <Select
                         value={filters.vendeur}
                         onValueChange={(value) => setFilters((prev) => ({ ...prev, vendeur: value }))}
@@ -1219,35 +1247,17 @@ const Vente = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">Tous les vendeurs</SelectItem>
-                          {vendeurOptions.map((vendeur, index) => (
-                            <SelectItem key={index} value={String(vendeur)}>
-                              {vendeur}
+                         { AllUser.data.map((vendeur, index) => (
+                         
+                            <SelectItem key={index} value={String(vendeur?.name)}>
+                              {vendeur?.name }
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
-                    {/* Client */}
-                    {/* <div className="space-y-2">
-                      <Label className="text-sm">Client</Label>
-                      <Select
-                        value={filters.client}
-                        onValueChange={(value) => setFilters((prev) => ({ ...prev, client: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Tous les clients" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Tous les clients</SelectItem>
-                          {AllClient.map((client) => (
-                            <SelectItem key={client.id} value={String(client.id)}>
-                              {client.name} {client.firstName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div> */}
+                     
                   </div>
                 </div>
 

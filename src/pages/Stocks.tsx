@@ -721,6 +721,8 @@ const Stocks = () => {
   }
   useEffect(() => {
     dispatch(changeMsg(""))
+  console.log(decoded);
+
   }, [])
   useEffect(() => {
     setStockStatistics(changeValue())
