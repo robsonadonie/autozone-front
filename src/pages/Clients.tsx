@@ -789,7 +789,7 @@ const Clients = () => {
       />
 
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
           <form action="" onSubmit={CreateVente}>
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold">Nouvelle vente pour :  {selectedClient?.name} {selectedClient?.firstName}</DialogTitle>

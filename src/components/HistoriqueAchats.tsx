@@ -54,7 +54,7 @@ let SellingStory = historique.filter((item :any)=>item.client.id == client?.id)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose} >
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden m-auto " style={{left :'56vw'}}>
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden m-auto bg-white" style={{left :'56vw'}}>
         <DialogHeader>
           <DialogTitle>Historique des achats</DialogTitle>
           <DialogDescription>

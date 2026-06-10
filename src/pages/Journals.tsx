@@ -597,7 +597,7 @@ factureParDate();
       </div>
 
 
-      <div className="grid grid-cols-1 md:grid-cols-4 bg-white p-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 bg-white p-2 gap-4">
         <StatCard
           title="Total Dépenses"
           value={`${((filteredExpenses.map((e) => e.montant)).length != 0 ? (formatNumber((filteredExpenses.map((e) => e.montant)).reduce((ac, el) => ac + el))) : 0)} Ar`}
@@ -619,6 +619,11 @@ factureParDate();
         <StatCard
           title="Solde en caise"
           value={`${formatCurrency(recetteespece)}`}
+          className="bg-purple-50 border-purple-100"
+        />
+        <StatCard
+          title="Mobile Money"
+          value={`${formatCurrency(dailyBalance-recetteespece) }`}
           className="bg-purple-50 border-purple-100"
         />
       </div>
